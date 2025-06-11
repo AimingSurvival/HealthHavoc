@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BMI Calculator - Health Havoc</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Health Havoc - BMI Calculator</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="nutrition.html">Nutrition</a>
+      <a href="workouts.html">Workouts</a>
+      <a href="planner.html">Planner</a>
+      <a href="bmi.html">BMI Calculator</a>
+      <a href="blog.html">Blog</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Calculate Your BMI</h2>
+    <input type="number" id="weight" placeholder="Weight (kg)" />
+    <input type="number" id="height" placeholder="Height (cm)" />
+    <button onclick="calculateBMI()">Calculate BMI</button>
+    <p id="bmi-result"></p>
+  </main>
+
+  <footer>&copy; 2025 Health Havoc</footer>
+  <script>
+    function calculateBMI() {
+      const weight = parseFloat(document.getElementById("weight").value);
+      const height = parseFloat(document.getElementById("height").value) / 100;
+      if (weight && height) {
+        const bmi = (weight / (height * height)).toFixed(2);
+        document.getElementById("bmi-result").innerText = `Your BMI is ${bmi}`;
+      } else {
+        document.getElementById("bmi-result").innerText = "Please enter valid values.";
+      }
+    }
+  </script>
+</body>
+</html>
