@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HealthHavoc Enhanced - Task Manager & Diet Guide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
+      color: #24292e;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Basic reset for tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #d1d5db;
+      background-color: #fff;
+      overflow-x: auto;
+    }
+    .tab-button {
+      flex: none;
+      padding: 12px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #6b7280;
+      border-bottom: 4px solid transparent;
+      transition: border-color 0.3s, color 0.3s;
+      background: none;
+      border: none;
+      outline: none;
+    }
+    .tab-button:hover,
+    .tab-button:focus {
+      color: #111827;
+    }
+    .tab-button.active {
+      border-color: #10b981;
+      color: #065f46;
+    }
+    .tab-content {
+      display: none;
+      padding: 24px;
+      background: white;
+      flex-grow: 1;
+      overflow-y: auto;
+      min-height: 600px;
+      max-width: 1200px;
+      margin: 16px auto;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+    }
+    .tab-content.active {
+      display: block;
+    }
+    /* Scrollable container for wide content */
+    main {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      padding: 24px 12px;
+      background: #f3f4f6;
+    }
+    /* Enhanced scroll and layout fixes */
+    #healthhavoc-app {
+      max-width: 1000px;
+      width: 100%;
+      background: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-sizing: border-box;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+    }
+
+    /* Sample task list style from HealthHavoc inferred */
+    #task-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #task-list li {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #task-list li:last-child {
+      border-bottom: none;
+    }
+    #task-list li.completed span.task-title {
+      text-decoration: line-through;
+      color: #9ca3af;
+    }
+    .task-title {
+      flex-grow: 1;
+      margin-left: 8px;
+    }
+    /* Buttons */
+    button {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      color: white;
+      background-color: #10b981;
+      transition: background-color 0.2s ease;
+    }
+    button:disabled {
+      background-color: #6b7280;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled),
+    button:focus:not(:disabled) {
+      background-color: #059669;
+      outline: none;
+    }
+
+    /* Scroll container for diet guide */
+    #diet-guide-container p {
+      max-width: 900px;
+      margin: 12px auto;
+    }
+
+    /* Loading spinner */
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: #e07a5f;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Scroll overflow for visualizer container */
+    .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 450px;
+      margin-left: auto;
+      margin-right: auto;
+      height: 300px;
+      max-height: 400px;
+    }
+
+    /* Responsive tweaks */
+    @media (min-width: 768px) {
+      .chart-container {
+        height: 350px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="bg-white shadow sticky top-0 z-50">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="font-bold text-xl">HealthHavoc</h1>
+      <div class="tabs" role="tablist" aria-label="Main tabs">
+        <button class="tab-button active" role="tab" aria-selected="true" aria-controls="tab-healthhavoc" id="tab-btn-healthhavoc" tabindex="0">Task Manager</button>
+        <button class="tab-button" role="tab" aria-selected="false" aria-controls="tab-dietguide" id="tab-btn-dietguide" tabindex="-1">Diet Guide</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Tab 1: HealthHavoc Task Manager app placeholder for demo -->
+    <section id="tab-healthhavoc" class="tab-content active" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-healthhavoc">
+      <div id="healthhavoc-app" aria-label="Task management application">
+        <h2 class="text-2xl font-semibold mb-4">HealthHavoc Task Manager</h2>
+
+        <form id="add-task-form" aria-label="Add new task" style="margin-bottom:16px;">
+          <input id="new-task-input" type="text" placeholder="Add new task..." aria-label="New task title" style="padding:8px;border:1px solid #d1d5db;border-radius:6px;width:70%; max-width:400px;" />
+          <button id="add-task-button" type="submit" disabled>Add</button>
+        </form>
+
+        <ul id="task-list" aria-live="polite" aria-relevant="all">
+          <!-- Tasks populated by JS -->
+        </ul>
+      </div>
+    </section>
+
+    <!-- Tab 2: Diet Guide integrated fully from the user's HTML snippet -->
+    <section id="tab-dietguide" class="tab-content" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-dietguide">
+
+      <header class="text-center mb-8">
+        <h2 class="text-3xl font-bold mb-2" style="color:#3D405B;">Your Guide to a Balanced Diet</h2>
+      </header>
+
+      <section id="intro" class="text-center mb-16">
+        <h3 class="text-2xl font-bold mb-2" style="color:#3D405B;">Nourish Your Body, Fuel Your Life</h3>
+        <p class="max-w-3xl mx-auto text-lg text-gray-700">
+          Welcome to your interactive guide to nutrition. This application translates general dietary recommendations for adult Indian men into an easy-to-understand format. Explore the essential nutrients your body needs to thrive, discover rich food sources, and visualize how to build a balanced plate.
+        </p>
+      </section>
+
+      <section id="macronutrients" class="mb-16">
+        <h3 class="text-3xl font-bold text-center mb-2" style="color:#3D405B;">The Building Blocks: Macronutrients</h3>
+        <p class="text-center text-gray-600 mb-8">Click on each card to explore the three key macronutrients that provide your body with energy.</p>
+        <div id="macro-cards-container" class="grid md:grid-cols-3 gap-8"></div>
+      </section>
+
+      <section id="micronutrients" class="mb-16">
+        <h3 class="text-3xl font-bold text-center mb-2" style="color:#3D405B;">Vital Spark Plugs: Micronutrients</h3>
+        <p class="text-center text-gray-600 mb-8">Discover the vitamins and minerals crucial for your body's functions. Click on a nutrient to learn more.</p>
+        <div class="flex justify-center mb-8">
+          <div class="bg-gray-200 rounded-full p-1 flex space-x-1">
+            <button id="vitamins-tab" class="tab-button px-6 py-2 rounded-full font-semibold transition active" type="button">Vitamins</button>
+            <button id="minerals-tab" class="tab-button px-6 py-2 rounded-full font-semibold transition" type="button">Minerals</button>
+          </div>
+        </div>
+        <div id="micro-cards-container"
+          class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
+      </section>
+
+      <section id="visualizer" class="mb-16">
+        <h3 class="text-3xl font-bold text-center mb-2" style="color:#3D405B;">Interactive Diet Visualizer</h3>
+        <p class="text-center text-gray-600 mb-8">See how these nutrients come together in a balanced diet.</p>
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div class="w-full">
+            <h4 class="text-xl font-semibold text-center mb-4">Ideal Macronutrient Split</h4>
+            <div class="chart-container">
+              <canvas id="macroChart"></canvas>
+            </div>
+          </div>
+          <div class="w-full">
+            <h4 class="text-xl font-semibold text-center mb-4">Micronutrient Daily Goals</h4>
+            <div id="micro-selector" class="flex flex-wrap justify-center gap-2 mb-4"></div>
+            <div id="micro-display" class="bg-white p-6 rounded-lg shadow-lg min-h-[180px] flex flex-col justify-center text-center text-gray-700">
+              <p>Select a micronutrient to see its details.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="smart-tools" class="mb-16">
+        <h3 class="text-3xl font-bold text-center mb-2" style="color:#3D405B;">Smart Diet Tools ✨</h3>
+        <p class="text-center text-gray-600 mb-8">Leverage AI to get personalized recipe and meal plan suggestions.</p>
+
+        <div class="grid md:grid-cols-2 gap-12">
+          <!-- Recipe Generator -->
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h4 class="text-xl font-semibold mb-4" style="color:#3D405B;">Recipe Generator ✨</h4>
+            <p class="text-gray-600 mb-4">Enter a list of ingredients you have, and I'll suggest a simple, balanced recipe for you.</p>
+            <textarea id="ingredients-input" class="w-full p-3 border border-gray-300 rounded-md mb-4 resize-y min-h-[100px]"
+              placeholder="e.g., Paneer, spinach, tomatoes, ginger, garlic"></textarea>
+            <button id="generate-recipe-btn" class="inline-block bg-[#E07A5F] text-white px-6 py-3 rounded-full font-semibold transition hover:bg-[#BF4F36] w-full">
+              Generate Recipe ✨
+            </button>
+            <div id="recipe-output"
+              class="mt-6 p-4 bg-gray-50 rounded-md border border-gray-200 min-h-[150px] text-gray-700 overflow-auto">
+              <p class="text-gray-500">Your recipe will appear here...</p>
+            </div>
+          </div>
+
+          <!-- Meal Plan Suggestion -->
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h4 class="text-xl font-semibold mb-4" style="color:#3D405B;">Meal Plan Suggestion ✨</h4>
+            <p class="text-gray-600 mb-4">Select your dietary preferences, and I'll suggest a one-day balanced meal plan.</p>
+            <div class="mb-4">
+              <label class="inline-flex items-center mr-4">
+                <input type="checkbox" id="pref-vegetarian" value="Vegetarian" class="form-checkbox h-5 w-5 text-[#E07A5F] rounded">
+                <span class="ml-2 text-gray-700">Vegetarian</span>
+              </label>
+              <label class="inline-flex items-center mr-4">
+                <input type="checkbox" id="pref-highprotein" value="High Protein" class="form-checkbox h-5 w-5 text-[#E07A5F] rounded">
+                <span class="ml-2 text-gray-700">High Protein</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="checkbox" id="pref-quickmeals" value="Quick Meals" class="form-checkbox h-5 w-5 text-[#E07A5F] rounded">
+                <span class="ml-2 text-gray-700">Quick Meals</span>
+              </label>
+            </div>
+            <button id="suggest-mealplan-btn" class="inline-block bg-[#E07A5F] text-white px-6 py-3 rounded-full font-semibold transition hover:bg-[#BF4F36] w-full">
+              Suggest Meal Plan ✨
+            </button>
+            <div id="mealplan-output"
+              class="mt-6 p-4 bg-gray-50 rounded-md border border-gray-200 min-h-[150px] text-gray-700 overflow-auto">
+              <p class="text-gray-500">Your meal plan will appear here...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="bg-gray-800 text-white py-6 mt-12 rounded-lg">
+        <div class="container mx-auto px-6 text-center">
+          <p>&copy; 2025 Nutritional Guide. All Rights Reserved.</p>
+          <p class="text-sm text-gray-400 mt-2">The information provided is for general guidance only and does not substitute for professional medical advice. Consult a healthcare provider or registered dietitian for personalized recommendations.</p>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    /*** TAB SWITCHING ***/
+    (() => {
+      const tabButtons = document.querySelectorAll(".tab-button");
+      const tabContents = document.querySelectorAll(".tab-content");
+
+      tabButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          // Deactivate all tabs
+          tabButtons.forEach(btn => {
+            btn.classList.remove("active");
+            btn.setAttribute("aria-selected", "false");
+            btn.setAttribute("tabindex", "-1");
+          });
+          tabContents.forEach(tc => tc.classList.remove("active"));
+          // Activate clicked tab and content
+          button.classList.add("active");
+          button.setAttribute("aria-selected", "true");
+          button.setAttribute("tabindex", "0");
+          document.getElementById(button.getAttribute("aria-controls")).classList.add("active");
+          document.getElementById(button.getAttribute("aria-controls")).focus();
+        });
+      });
+    })();
+
+    /*** HEALTHHAVOC TASK MANAGER DEMO ***/
+    (() => {
+      const taskInput = document.getElementById("new-task-input");
+      const addTaskBtn = document.getElementById("add-task-button");
+      const taskList = document.getElementById("task-list");
+      let tasks = [];
+
+      function renderTasks() {
+        taskList.innerHTML = "";
+        tasks.forEach((task, i) => {
+          const li = document.createElement("li");
+          li.setAttribute("tabindex", 0);
+          li.className = task.completed ? "completed" : "";
+          li.innerHTML = \`
+            <label style="display:flex;align-items:center;gap:8px;flex-grow:1;cursor:pointer;">
+              <input type="checkbox" \${task.completed ? "checked" : ""} aria-label="Toggle completion for \${task.title}" />
+              <span class="task-title">\${task.title}</span>
+            </label>
+            <button aria-label="Delete \${task.title}" style="background:#ef4444;" title="Delete task">Del</button>
+          \`;
+          // Completion toggle
+          li.querySelector("input[type=checkbox]").addEventListener("change", e => {
+            tasks[i].completed = e.target.checked;
+            renderTasks();
+          });
+          // Delete button
+          li.querySelector("button").addEventListener("click", () => {
+            tasks.splice(i, 1);
+            renderTasks();
+          });
+          taskList.appendChild(li);
+        });
+      }
+
+      addTaskBtn.disabled = true;
+      taskInput.addEventListener("input", () => {
+        addTaskBtn.disabled = !taskInput.value.trim();
+      });
+
+      addTaskBtn.addEventListener("click", e => {
+        e.preventDefault();
+        const value = taskInput.value.trim();
+        if (!value) return;
+        tasks.push({ title: value, completed: false });
+        taskInput.value = "";
+        addTaskBtn.disabled = true;
+        renderTasks();
+      });
+    })();
+
+    /*** DIET GUIDE FUNCTIONALITY ***/
+    (() => {
+      const dietData = {
+        macronutrients: [
+          { name: 'Carbohydrates', dailyRec: '250-350 g', percentage: '50-60%', function: 'Main energy source, provide fiber, support brain function', types: [{ name: 'Complex', sources: 'Whole wheat (roti, bread, atta), brown rice, oats, millets (bajra, ragi, jowar), quinoa, legumes (dal, chickpeas), potatoes, sweet potatoes' }, { name: 'Simple', sources: 'Limit intake from added sugars: Sugar, jaggery, honey, fruits' }] },
+          { name: 'Proteins', dailyRec: '60 g', percentage: '15-20%', function: 'Build and repair tissues, muscle growth, enzyme and hormone production, immune function', types: [{ name: 'Complete', sources: 'Chicken, fish, eggs, dairy (milk, paneer, yogurt), soy, quinoa' }, { name: 'Incomplete', sources: 'Legumes (dal, beans), nuts, seeds, grains (combine to make complete)' }] },
+          { name: 'Fats', dailyRec: '<70g', percentage: '20-30%', function: 'Energy storage, hormone production, insulation, vitamin absorption', types: [{ name: 'Saturated', sources: '<10% of calories: Ghee, butter, red meat, coconut oil' }, { name: 'Monounsaturated', sources: 'Olive oil, groundnut oil, avocado, almonds, cashews' }, { name: 'Polyunsaturated', sources: 'Omega-3: Fatty fish, flaxseeds, walnuts; Omega-6: Sunflower oil, soybean oil' }] }
+        ],
+        micronutrients: {
+          vitamins: [
+            { name: 'Vitamin A', rec: '600 mcg', sources: 'Carrots, spinach, mango, sweet potatoes', func: 'Vision, immune function, skin health' },
+            { name: 'Vitamin C', rec: '40 mg', sources: 'Amla, guava, citrus fruits, bell peppers', func: 'Immune support, antioxidant' },
+            { name: 'Vitamin D', rec: '10 mcg', sources: 'Sunlight, fatty fish, fortified milk', func: 'Bone health, calcium absorption' },
+            { name: 'Vitamin E', rec: '10 mg', sources: 'Almonds, sunflower seeds, spinach', func: 'Antioxidant, protects cells' },
+            { name: 'B Vitamins', rec: 'Varies', sources: 'Whole grains, legumes, leafy greens, eggs, meat', func: 'Energy metabolism, nerve function' }
+          ],
+          minerals: [
+            { name: 'Calcium', rec: '600 mg', sources: 'Milk, paneer, yogurt, ragi, leafy greens', func: 'Bone and teeth strength, muscle function' },
+            { name: 'Iron', rec: '8 mg', sources: 'Lentils, spinach, jaggery, red meat', func: 'Oxygen transport, energy production' },
+            { name: 'Zinc', rec: '12 mg', sources: 'Legumes, nuts, seeds, meat, dairy', func: 'Immune function, wound healing' },
+            { name: 'Potassium', rec: '3500 mg', sources: 'Bananas, potatoes, spinach, lentils', func: 'Fluid balance, nerve signals' },
+            { name: 'Sodium', rec: '<2000 mg', sources: 'Table salt, processed foods (limit)', func: 'Fluid balance (excess raises BP)' },
+            { name: 'Iodine', rec: '150 mcg', sources: 'Iodized salt, seafood, dairy', func: 'Thyroid hormone production' }
+          ]
+        }
+      };
+
+      const macroColors = { 'Carbohydrates': '#F9C74F', 'Proteins': '#F94144', 'Fats': '#43AA8B' };
+      const macroContainer = document.getElementById('macro-cards-container');
+      const microContainer = document.getElementById('micro-cards-container');
+      const vitaminsTab = document.getElementById('vitamins-tab');
+      const mineralsTab = document.getElementById('minerals-tab');
+      const microSelector = document.getElementById('micro-selector');
+      const microDisplay = document.getElementById('micro-display');
+
+      // Generate Macro Cards
+      function createMacroCards() {
+        macroContainer.innerHTML = '';
+        dietData.macronutrients.forEach(macro => {
+          const card = document.createElement('div');
+          card.className = 'nutrient-card bg-white rounded-lg shadow-lg p-6 cursor-pointer';
+          card.style.transition = 'all 0.3s ease-in-out';
+          card.innerHTML = \`
+            <div class="flex justify-between items-start">
+              <h3 class="text-2xl font-bold mb-2" style="color: \${macroColors[macro.name]};">\${macro.name}</h3>
+              <div class="text-right">
+                <p class="font-bold text-lg">\${macro.percentage}</p>
+                <p class="text-sm text-gray-500">of daily calories</p>
+              </div>
+            </div>
+            <p class="text-gray-600 mb-4">\${macro.function}</p>
+            <div class="details" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out;">
+              \${macro.types.map(type => \`
+                <div class="mt-4">
+                  <h4 class="font-semibold text-md">\${type.name}</h4>
+                  <p class="text-sm text-gray-500">\${type.sources}</p>
+                </div>
+              \`).join('')}
+            </div>
+            <div class="text-center mt-4">
+              <span class="text-sm font-semibold text-[#3D405B]">Click to see sources</span>
+            </div>
+          \`;
+          card.addEventListener('click', () => {
+            const detailsDiv = card.querySelector('.details');
+            if (card.classList.contains('open')) {
+              detailsDiv.style.maxHeight = '0';
+              card.classList.remove('open');
+            } else {
+              detailsDiv.style.maxHeight = detailsDiv.scrollHeight + "px";
+              card.classList.add('open');
+            }
+          });
+          macroContainer.appendChild(card);
+        });
+      }
+
+      // Generate Micro Cards
+      function createMicroCards(type) {
+        microContainer.innerHTML = '';
+        dietData.micronutrients[type].forEach(micro => {
+          const card = document.createElement('div');
+          card.className = 'nutrient-card bg-white rounded-lg shadow p-3 text-center cursor-pointer hover:shadow-lg';
+          card.innerHTML = \`
+            <h4 class="font-bold text-md">\${micro.name}</h4>
+            <p class="text-sm text-gray-500 mb-2">\${micro.rec}</p>
+            <div class="details" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out;">
+                <p class="text-xs text-gray-600 font-semibold">\${micro.func}</p>
+                <p class="text-xs text-gray-500 mt-1"><strong>Sources:</strong> \${micro.sources}</p>
+            </div>
+          \`;
+          card.addEventListener('click', () => {
+            const detailsDiv = card.querySelector('.details');
+            if (card.classList.contains('open')) {
+              detailsDiv.style.maxHeight = '0';
+              card.classList.remove('open');
+            } else {
+              detailsDiv.style.maxHeight = detailsDiv.scrollHeight + "px";
+              card.classList.add('open');
+            }
+          });
+          microContainer.appendChild(card);
+        });
+      }
+
+      // Micro selector buttons population for visualizer
+      function populateMicroSelector() {
+        microSelector.innerHTML = '';
+        [...dietData.micronutrients.vitamins, ...dietData.micronutrients.minerals].forEach(micro => {
+          const button = document.createElement('button');
+          button.className = 'bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-semibold hover:bg-[#81B29A] hover:text-white transition cursor-pointer';
+          button.textContent = micro.name;
+          button.type = 'button';
+          button.onclick = () => updateMicroDisplay(micro);
+          microSelector.appendChild(button);
+        });
+      }
+
+      // Update micronutrient detail display
+      function updateMicroDisplay(micro) {
+        microDisplay.innerHTML = \`
+          <h4 class="text-lg font-bold text-[#3D405B] mb-3">\${micro.name}</h4>
+          <p class="text-3xl font-bold mb-1">\${micro.rec}</p>
+          <p class="text-sm text-gray-600 mb-2">Recommended Daily Intake</p>
+          <p><strong>Function:</strong> \${micro.func}</p>
+        \`;
+      }
+
+      // Macronutrient Chart
+      function createMacroChart() {
+        const ctx = document.getElementById('macroChart').getContext('2d');
+        window.macroChartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: [ 'Carbohydrates', 'Proteins', 'Fats' ],
+            datasets: [{
+              data: [ 55, 20, 25 ],
+              backgroundColor: [
+                macroColors['Carbohydrates'],
+                macroColors['Proteins'],
+                macroColors['Fats']
+              ],
+              borderColor: '#FDFBF6',
+              borderWidth: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  font: {
+                    size: 14,
+                    family: 'Inter'
+                  }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    let label = context.label || '';
+                    if (label) label += ': ';
+                    if (context.parsed !== null) label += context.parsed + '%';
+                    return label;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      vitaminsTab.addEventListener('click', () => {
+        createMicroCards('vitamins');
+        vitaminsTab.classList.add('active');
+        mineralsTab.classList.remove('active');
+      });
+
+      mineralsTab.addEventListener('click', () => {
+        createMicroCards('minerals');
+        mineralsTab.classList.add('active');
+        vitaminsTab.classList.remove('active');
+      });
+
+      // AI integration using Gemini API mockup (disabled real calls)
+      async function callGeminiAPI(prompt, outputDiv, loadingButton) {
+        outputDiv.innerHTML = '<p class="text-center text-gray-500"><span class="loading-spinner"></span> Generating...</p>';
+        loadingButton.disabled = true;
+        // Simulate API delay
+        setTimeout(() => {
+          outputDiv.innerHTML = '<p><strong>Sample AI generated response based on prompt:</strong><br>' + prompt + '</p>';
+          loadingButton.disabled = false;
+        }, 2000);
+      }
+
+      const generateRecipeBtn = document.getElementById('generate-recipe-btn');
+      const recipeOutput = document.getElementById('recipe-output');
+      const ingredientsInput = document.getElementById('ingredients-input');
+      generateRecipeBtn.addEventListener('click', () => {
+        const ingredients = ingredientsInput.value.trim();
+        if (ingredients) {
+          const prompt = "Suggest a simple, balanced Indian recipe using these ingredients: " + ingredients + ". Provide a list of ingredients and step-by-step instructions.";
+          callGeminiAPI(prompt, recipeOutput, generateRecipeBtn);
+        } else {
+          recipeOutput.innerHTML = '<p class="text-red-500">Please enter some ingredients!</p>';
+        }
+      });
+
+      const suggestMealplanBtn = document.getElementById('suggest-mealplan-btn');
+      const mealplanOutput = document.getElementById('mealplan-output');
+      const prefVegetarian = document.getElementById('pref-vegetarian');
+      const prefHighProtein = document.getElementById('pref-highprotein');
+      const prefQuickMeals = document.getElementById('pref-quickmeals');
+
+      suggestMealplanBtn.addEventListener('click', () => {
+        const prefs = [];
+        if (prefVegetarian.checked) prefs.push('Vegetarian');
+        if (prefHighProtein.checked) prefs.push('High Protein');
+        if (prefQuickMeals.checked) prefs.push('Quick Meals');
+        let prompt = "Suggest a one-day balanced Indian meal plan (Breakfast, Lunch, Dinner, Snacks).";
+        if (prefs.length > 0) prompt += " Consider the following preferences: " + prefs.join(", ") + ".";
+        else prompt += " Assume a general healthy diet for an adult Indian man.";
+        callGeminiAPI(prompt, mealplanOutput, suggestMealplanBtn);
+      });
+
+      // Init diet guide
+      createMacroCards();
+      createMicroCards('vitamins');
+      createMacroChart();
+      populateMicroSelector();
+
+    })();
+  </script>
+
+</body>
+</html>
+
