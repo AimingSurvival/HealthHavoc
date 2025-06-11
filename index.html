@@ -10,14 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Calm Neutrals -->
-    <!-- Application Structure Plan: The SPA is structured into five logical sections for optimal user experience: an introduction, an interactive macronutrient explorer, a tabbed micronutrient guide, a data visualizer, and a new Smart Diet Tools section. This thematic dashboard approach was chosen over a simple table to make the dense nutritional information more digestible and engaging. Users can get a high-level overview and then "drill down" into specific nutrients they are interested in. The data visualizer section provides a powerful, interactive way to compare nutrient recommendations, making the data more tangible. The new Smart Diet Tools leverage AI for practical, personalized dietary assistance. This user-driven, progressive disclosure model is designed for better comprehension, retention, and direct utility. -->
+    <!-- Application Structure Plan: The SPA is structured into four logical sections for optimal user experience: an introduction, an interactive macronutrient explorer, a tabbed micronutrient guide, and a data visualizer. This thematic dashboard approach was chosen over a simple table to make the dense nutritional information more digestible and engaging. Users can get a high-level overview and then "drill down" into specific nutrients they are interested in. The data visualizer section provides a powerful, interactive way to compare nutrient recommendations, making the data more tangible. This user-driven, progressive disclosure model is designed for better comprehension and retention. -->
     <!-- Visualization & Content Choices: 
         1. Macronutrients: Report Info -> Macro details. Goal -> Inform & Compare. Viz -> Interactive HTML cards. Interaction -> Click to expand. Justification -> More engaging than a static table, allows focused learning. Library -> HTML/CSS.
         2. Micronutrients: Report Info -> Vitamin & Mineral details. Goal -> Organize & Inform. Viz -> Tabbed grid of cards. Interaction -> Click to reveal details. Justification -> Cleanly separates dense data, prevents overwhelm. Library -> HTML/CSS.
         3. Diet Composition: Report Info -> Macro calorie percentages. Goal -> Visualize Proportions. Viz -> Donut Chart. Interaction -> Static display for immediate insight. Justification -> Best for showing part-to-whole data. Library -> Chart.js.
         4. Nutrient Comparison: Report Info -> Specific nutrient RDA. Goal -> Explore & Quantify. Viz -> Bar Chart & Dynamic Text. Interaction -> User selects nutrient via buttons to update chart and text. Justification -> Makes abstract numbers concrete and interactive. Library -> Chart.js.
-        5. Recipe Generator: Report Info -> User ingredients. Goal -> Provide practical utility. Viz -> Text output. Interaction -> User input + button click. Justification -> Direct application of LLM for user benefit. Library -> Gemini API.
-        6. Meal Plan Suggestion: Report Info -> User dietary preferences. Goal -> Provide personalized guidance. Viz -> Text output. Interaction -> User selection + button click. Justification -> Direct application of LLM for user benefit. Library -> Gemini API.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -57,18 +55,8 @@
                 height: 350px;
             }
         }
-        .ai-button {
-            background-color: #E07A5F;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 9999px;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
-        .ai-button:hover {
-            background-color: #BF4F36;
-        }
-        .loading-spinner {
+        /* AI specific styles removed */
+        .loading-spinner { /* Kept as it might be used by other parts, but won't be active */
             border: 4px solid rgba(0, 0, 0, 0.1);
             border-left-color: #E07A5F;
             border-radius: 50%;
@@ -94,7 +82,6 @@
                 <a href="#macronutrients" class="text-gray-600 hover:text-[#E07A5F] transition">Macronutrients</a>
                 <a href="#micronutrients" class="text-gray-600 hover:text-[#E07A5F] transition">Micronutrients</a>
                 <a href="#visualizer" class="text-gray-600 hover:text-[#E07A5F] transition">Visualizer</a>
-                <a href="#smart-tools" class="text-gray-600 hover:text-[#E07A5F] transition">Smart Tools ✨</a>
             </div>
         </nav>
     </header>
@@ -149,47 +136,7 @@
             </div>
         </section>
 
-        <section id="smart-tools" class="mb-16">
-            <h2 class="text-3xl font-bold text-center mb-2 text-[#3D405B]">Smart Diet Tools ✨</h2>
-            <p class="text-center text-gray-600 mb-8">Leverage AI to get personalized recipe and meal plan suggestions.</p>
-
-            <div class="grid md:grid-cols-2 gap-12">
-                <!-- Recipe Generator -->
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <h3 class="text-xl font-semibold mb-4 text-[#3D405B]">Recipe Generator ✨</h3>
-                    <p class="text-gray-600 mb-4">Enter a list of ingredients you have, and I'll suggest a simple, balanced recipe for you.</p>
-                    <textarea id="ingredients-input" class="w-full p-3 border border-gray-300 rounded-md mb-4 resize-y min-h-[100px]" placeholder="e.g., Paneer, spinach, tomatoes, ginger, garlic"></textarea>
-                    <button id="generate-recipe-btn" class="ai-button w-full">Generate Recipe ✨</button>
-                    <div id="recipe-output" class="mt-6 p-4 bg-gray-50 rounded-md border border-gray-200 min-h-[150px] text-gray-700 overflow-auto">
-                        <p class="text-gray-500">Your recipe will appear here...</p>
-                    </div>
-                </div>
-
-                <!-- Meal Plan Suggestion -->
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <h3 class="text-xl font-semibold mb-4 text-[#3D405B]">Meal Plan Suggestion ✨</h3>
-                    <p class="text-gray-600 mb-4">Select your dietary preferences, and I'll suggest a one-day balanced meal plan.</p>
-                    <div class="mb-4">
-                        <label class="inline-flex items-center mr-4">
-                            <input type="checkbox" id="pref-vegetarian" value="Vegetarian" class="form-checkbox h-5 w-5 text-[#E07A5F] rounded">
-                            <span class="ml-2 text-gray-700">Vegetarian</span>
-                        </label>
-                        <label class="inline-flex items-center mr-4">
-                            <input type="checkbox" id="pref-highprotein" value="High Protein" class="form-checkbox h-5 w-5 text-[#E07A5F] rounded">
-                            <span class="ml-2 text-gray-700">High Protein</span>
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input type="checkbox" id="pref-quickmeals" value="Quick Meals" class="form-checkbox h-5 w-5 text-[#E07A5F] rounded">
-                            <span class="ml-2 text-gray-700">Quick Meals</span>
-                        </label>
-                    </div>
-                    <button id="suggest-mealplan-btn" class="ai-button w-full">Suggest Meal Plan ✨</button>
-                    <div id="mealplan-output" class="mt-6 p-4 bg-gray-50 rounded-md border border-gray-200 min-h-[150px] text-gray-700 overflow-auto">
-                        <p class="text-gray-500">Your meal plan will appear here...</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <!-- Removed Smart Diet Tools section -->
 
     </main>
     
@@ -234,15 +181,9 @@
             const microSelector = document.getElementById('micro-selector');
             const microDisplay = document.getElementById('micro-display');
             
-            const ingredientsInput = document.getElementById('ingredients-input');
-            const generateRecipeBtn = document.getElementById('generate-recipe-btn');
-            const recipeOutput = document.getElementById('recipe-output');
-
-            const prefVegetarian = document.getElementById('pref-vegetarian');
-            const prefHighProtein = document.getElementById('pref-highprotein');
-            const prefQuickMeals = document.getElementById('pref-quickmeals');
-            const suggestMealplanBtn = document.getElementById('suggest-mealplan-btn');
-            const mealplanOutput = document.getElementById('mealplan-output');
+            // Removed AI tool specific elements and their associated variables
+            // ingredientsInput, generateRecipeBtn, recipeOutput, prefVegetarian, 
+            // prefHighProtein, prefQuickMeals, suggestMealplanBtn, mealplanOutput;
 
             const macroColors = {
                 'Carbohydrates': '#F9C74F',
@@ -383,68 +324,7 @@
                 });
             }
 
-            // Gemini API Integration
-            async function callGeminiAPI(prompt, outputDiv, loadingButton) {
-                outputDiv.innerHTML = `<p class="text-center text-gray-500"><span class="loading-spinner"></span> Generating...</p>`;
-                loadingButton.disabled = true;
-
-                try {
-                    let chatHistory = [];
-                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                    const payload = { contents: chatHistory };
-                    // API key is not needed here; Canvas provides it automatically at runtime.
-                    const apiKey = ""; 
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`; // Removed ?key=${apiKey}
-
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    const result = await response.json();
-                    if (result.candidates && result.candidates.length > 0 &&
-                        result.candidates[0].content && result.candidates[0].content.parts &&
-                        result.candidates[0].content.parts.length > 0) {
-                        const text = result.candidates[0].content.parts[0].text;
-                        outputDiv.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`;
-                    } else {
-                        outputDiv.innerHTML = `<p class="text-red-500">Error: Could not generate response. Please try again.</p>`;
-                    }
-                } catch (error) {
-                    console.error('Error calling Gemini API:', error);
-                    outputDiv.innerHTML = `<p class="text-red-500">Error: Failed to connect to AI. Please try again later.</p>`;
-                } finally {
-                    loadingButton.disabled = false;
-                }
-            }
-
-            generateRecipeBtn.addEventListener('click', () => {
-                const ingredients = ingredientsInput.value.trim();
-                if (ingredients) {
-                    const prompt = `Suggest a simple, balanced Indian recipe using these ingredients: ${ingredients}. Provide a list of ingredients and step-by-step instructions.`;
-                    callGeminiAPI(prompt, recipeOutput, generateRecipeBtn);
-                } else {
-                    recipeOutput.innerHTML = `<p class="text-red-500">Please enter some ingredients!</p>`;
-                }
-            });
-
-            suggestMealplanBtn.addEventListener('click', () => {
-                const preferences = [];
-                if (prefVegetarian.checked) preferences.push(prefVegetarian.value);
-                if (prefHighProtein.checked) preferences.push(prefHighProtein.value);
-                if (prefQuickMeals.checked) preferences.push(prefQuickMeals.value);
-
-                let prompt = `Suggest a one-day balanced Indian meal plan (Breakfast, Lunch, Dinner, Snacks).`;
-                if (preferences.length > 0) {
-                    prompt += ` Consider the following preferences: ${preferences.join(', ')}.`;
-                } else {
-                    prompt += ` Assume a general healthy diet for an adult Indian man.`;
-                }
-
-                callGeminiAPI(prompt, mealplanOutput, suggestMealplanBtn);
-            });
-
+            // Removed Gemini API integration functions and event listeners
 
             createMacroCards();
             createMicroCards('vitamins');
