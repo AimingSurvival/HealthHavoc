@@ -55,22 +55,6 @@
                 height: 350px;
             }
         }
-        /* AI specific styles removed */
-        .loading-spinner { /* Kept as it might be used by other parts, but won't be active */
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #E07A5F;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body class="antialiased">
@@ -136,8 +120,6 @@
             </div>
         </section>
 
-        <!-- Removed Smart Diet Tools section -->
-
     </main>
     
     <footer class="bg-gray-800 text-white mt-16 py-6">
@@ -150,7 +132,7 @@
     <script>
         const dietData = {
             macronutrients: [
-                { name: 'Carbohydrates', dailyRec: '250-350 g', percentage: '50-60%', function: 'Main energy source, provide fiber, support brain function', types: [{ name: 'Complex', sources: 'Whole wheat (roti, bread, atta), brown rice, oats, millets (bajra, ragi, jowar), quinoa, legumes (dal, chickpeas), potatoes, sweet potatoes' }, { name: 'Simple', sources: 'Limit intake from added sugars: Sugar, jaggery, honey, fruits' }] },
+                { name: 'Carbohydrates', dailyRec: '250-350 g', percentage: '50-60%', function: 'Main energy source, provide fiber, support brain function', types: [{ name: 'Complex', sources: 'Whole wheat (roti, bread, atta), brown rice, oats, millets (bajra, ragi, jowar), quinoa, legumes (dal, chickpeas), potatoes, sweet potatoes' }] },
                 { name: 'Proteins', dailyRec: '60 g', percentage: '15-20%', function: 'Build and repair tissues, muscle growth, enzyme and hormone production, immune function', types: [{ name: 'Complete', sources: 'Chicken, fish, eggs, dairy (milk, paneer, yogurt), soy, quinoa' }, { name: 'Incomplete', sources: 'Legumes (dal, beans), nuts, seeds, grains (combine to make complete)' }] },
                 { name: 'Fats', dailyRec: '<70g', percentage: '20-30%', function: 'Energy storage, hormone production, insulation, vitamin absorption', types: [{ name: 'Saturated', sources: '<10% of calories: Ghee, butter, red meat, coconut oil' }, { name: 'Monounsaturated', sources: 'Olive oil, groundnut oil, avocado, almonds, cashews' }, { name: 'Polyunsaturated', sources: 'Omega-3: Fatty fish, flaxseeds, walnuts; Omega-6: Sunflower oil, soybean oil' }] }
             ],
@@ -181,10 +163,6 @@
             const microSelector = document.getElementById('micro-selector');
             const microDisplay = document.getElementById('micro-display');
             
-            // Removed AI tool specific elements and their associated variables
-            // ingredientsInput, generateRecipeBtn, recipeOutput, prefVegetarian, 
-            // prefHighProtein, prefQuickMeals, suggestMealplanBtn, mealplanOutput;
-
             const macroColors = {
                 'Carbohydrates': '#F9C74F',
                 'Proteins': '#F94144',
@@ -323,8 +301,6 @@
                     }
                 });
             }
-
-            // Removed Gemini API integration functions and event listeners
 
             createMacroCards();
             createMicroCards('vitamins');
