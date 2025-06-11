@@ -1,1 +1,0 @@
-console.log('Health Havoc loaded');
